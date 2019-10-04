@@ -7,6 +7,7 @@ const transform = function (ast) {
   walk(ast, (node, replace) => {
     switch (node.type) {
       case 'Tag':
+        node.name = node.name.replace(/-/g, '.');
         node.attrs.forEach(attr => {
           let { name, val } = attr;
           if (name.startsWith('...')) {
