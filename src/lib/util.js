@@ -121,6 +121,10 @@ const analyzeJsx = (jsxOutput, options = {}) => {
       if (p.parent.node.type === 'CallExpression' && p.node.name === 'require') {
         return false;
       }
+      // exclude namespace key
+      if (p.parent.node.type === 'JSXNamespacedName') {
+        return false;
+      }
       return true;
     })
     .forEach((p) => {

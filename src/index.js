@@ -165,6 +165,8 @@ const toJsx = (source, options = {}) => {
     };
   }
 
+  result.jsx = result.jsx.replace(/(<\/?)([^ >.\s\n]+(\.[^ >.\s\n]+)+)/g, x => x.replace(/\./g, '-'));
+
   return result;
 };
 
