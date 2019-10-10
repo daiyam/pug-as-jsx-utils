@@ -223,6 +223,11 @@ const pugToJsx = (source, userOptions = {}) => {
     if (result.useGet) {
       result.imports.push({ name: '_get', moduleName: 'lodash-es/get' });
     }
+    // next
+    if (result.variables.includes('Link')) {
+      result.imports.push({ name: 'Link', moduleName: 'next/link' });
+      result.variables = result.variables.filter(x => x !== 'Link');
+    }
     const jsxTemplate = [
       result.useFragment
         ? `import ${_import}, { Fragment } from '${_module}';`
