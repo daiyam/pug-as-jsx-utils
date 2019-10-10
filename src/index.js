@@ -208,6 +208,11 @@ const pugToJsx = (source, userOptions = {}) => {
 
   if (options.template) {
     result.imports = result.imports.concat(Object.values(result.requires).map(([ name, moduleName ]) => ({ name, moduleName })));
+    // next
+    if (result.variables.includes('Link')) {
+      result.imports.push({ name: 'Link', moduleName: 'next/link' });
+      result.variables = result.variables.filter(x => x !== 'Link');
+    }
     const jsxTemplate = [
       result.useFragment
         ? `import ${_import}, { Fragment } from '${_module}';`
