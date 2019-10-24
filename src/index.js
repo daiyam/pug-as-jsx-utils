@@ -201,6 +201,10 @@ const pugToJsx = (source, userOptions = {}) => {
   const [_module, _import] = getPragma(options.pragma);
 
   if (options.template) {
+    // _get
+    if (result.useGet) {
+      result.imports.push({ name: '_get', moduleName: 'lodash-es/get' });
+    }
     const jsxTemplate = [
       result.useFragment
         ? `import ${_import}, { Fragment } from '${_module}';`
