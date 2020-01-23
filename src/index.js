@@ -36,6 +36,15 @@ const resolveModule = (moduleName, rootDir) => {
   return moduleName;
 };
 
+const antd = {
+  names: Object.keys(require('antd')).filter(x => /^[A-Z]/.test(x)),
+  modules: { },
+};
+antd.names.forEach(name => {
+  const module = name[0].toLowerCase() + name.substr(1).replace(/[A-Z]/g, c => `-${c.toLowerCase()}`);
+  antd.modules[name] = { name, moduleName: `antd/es/${ module }` };
+});
+
 const toJsx = (source, options = {}) => {
   const localWorks = works.map(({ pre, post }) => ({ pre, post, context: {} }));
 
@@ -227,6 +236,12 @@ const pugToJsx = (source, userOptions = {}) => {
     if (result.variables.includes('Link')) {
       result.imports.push({ name: 'Link', moduleName: 'next/link' });
       result.variables = result.variables.filter(x => x !== 'Link');
+    }
+    // antd
+    const names = antd.names.filter(x => result.variables.includes(x)).sort();
+    if (names.length) {
+      result.imports = result.imports.concat(names.map(x => antd.modules[x]));
+      result.variables = result.variables.filter(x => !names.includes(x));
     }
     const jsxTemplate = [
       result.useFragment
