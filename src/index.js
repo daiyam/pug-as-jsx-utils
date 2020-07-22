@@ -12,8 +12,10 @@ import codemod from './codemod';
 import addRoleButton from './codemod/addRoleButton';
 
 const path = require('path');
+const fs = require('fs');
 const generateCode = require('pug-code-gen');
 const runtimeWrap = require('pug-runtime/wrap');
+const { zipObject } = require('lodash');
 
 const jsxPrettierOptions = {
   parser: 'babel',
@@ -113,6 +115,18 @@ const processJsxCode = (jsxCode, options, localWorks, annot, resolves) => {
 
   return result;
 }
+
+let taroComponents = fs.readdirSync('node_modules/@tarojs/components/types')
+  .filter(x => /^[A-Z]/.test(x))
+  .map(x => x.split('.')[0]);
+taroComponents = zipObject(taroComponents, taroComponents.map(x => ({ name: x })));
+
+let taroUIComponents = fs.readdirSync('node_modules/taro-ui/types')
+  .map(x => x.split('.')[0])
+  .filter(x => ![ 'index', 'base' ].includes(x))
+  .concat([ 'ListItem' ])
+  .map(x => 'At' + x.replace(/(^|-)[a-z]/g, c => c.replace('-', '').toUpperCase()));
+taroUIComponents = zipObject(taroUIComponents, taroUIComponents.map(x => ({ name: x })));
 
 const toJsx = (source, options = {}) => {
   const localWorks = works.map(({ pre, post }) => ({ pre, post, context: {} }));
@@ -249,6 +263,18 @@ const pugToJsx = (source, userOptions = {}) => {
     // _get
     if (result.useGet) {
       result.imports.push({ name: '_get', moduleName: 'lodash-es/get' });
+    }
+    // taro
+    const taro = result.variables.filter(x => taroComponents[x]);
+    if (taro.length) {
+      result.imports.push({ moduleName: '@tarojs/components', member: taro.map(x => taroComponents[x]) });
+      result.variables = result.variables.filter(x => !taroComponents[x]);
+    }
+    // taro ui
+    const taroUI = result.variables.filter(x => taroUIComponents[x]);
+    if (taroUI.length) {
+      result.imports.push({ moduleName: 'taro-ui', member: taroUI.map(x => taroUIComponents[x]) });
+      result.variables = result.variables.filter(x => !taroUIComponents[x]);
     }
     const jsxTemplate = [
       result.useFragment
