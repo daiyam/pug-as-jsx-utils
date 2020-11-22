@@ -1,6 +1,6 @@
 {
-  "name": "pug-as-jsx-utils",
-  "version": "1.0.45",
+  "name": "@daiyam/pug-as-jsx-utils",
+  "version": "1.0.45-d1",
   "main": "dist/pug-as-jsx-utils.cjs.js",
   "module": "dist/pug-as-jsx-utils.es.js",
   "jsnext:main": "dist/pug-as-jsx-utils.es.js",
@@ -19,6 +19,7 @@
     "@babel/preset-react": "^7.0.0",
     "glob": "^7.1.6",
     "jscodeshift": "^0.6.4",
+    "object-assign-deep": "^0.4.0",
     "prettier": "^1.18.2",
     "pug": "^2.0.4",
     "recast": "^0.18.5"

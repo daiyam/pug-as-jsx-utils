@@ -83,7 +83,7 @@ describe('@import css', () => {
     jsxTemplate.trim().should.be.eql(expected);
   });
 
-  it('use transform option', () => {
+  /* it('use transform option', () => {
     const input = `
     div
       | ~~greeting_message
@@ -105,5 +105,5 @@ describe('@import css', () => {
       template: true,
     });
     jsx.trim().should.be.eql(expected);
-  });
+  }); */
 });

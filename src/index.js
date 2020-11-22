@@ -10,6 +10,7 @@ import works from './rules/works';
 import annotations from './rules/annotations';
 import codemod from './codemod';
 import addRoleButton from './codemod/addRoleButton';
+import assign from 'object-assign-deep';
 
 const path = require('path');
 const generateCode = require('pug-code-gen');
@@ -82,9 +83,9 @@ const processJsxCode = (jsxCode, options, localWorks, annot, resolves) => {
   jsxCode = jsxCode.replace(/({\.\.\..+})="__rest"/g, '$1');
 
   try {
-    jsxCode = prettier.format(`(${jsxCode})`, jsxPrettierOptions);
+    jsxCode = prettier.format(`(${jsxCode})`, options.prettier);
   } catch (err) {
-    jsxCode = prettier.format(`<>${jsxCode}</>`, jsxPrettierOptions);
+    jsxCode = prettier.format(`<>${jsxCode}</>`, options.prettier);
   }
 
   // autofix features.
@@ -169,7 +170,9 @@ const toJsx = (source, options = {}) => {
     }, pugCode);
 
   // remove duplicate attributes
-  pugCode = removeDupAttrs(pugCode);
+  if(!options.noDedup) {
+    pugCode = removeDupAttrs(pugCode);
+  }
 
   const mixins = {};
   const plugins = [{
@@ -203,13 +206,14 @@ const toJsx = (source, options = {}) => {
 };
 
 const pugToJsx = (source, userOptions = {}) => {
-  const options = {
+  const options = assign({
     template: false,
     analyze: false,
     resolve: {},
     transform: [],
-    ...userOptions,
-  };
+    prettier: {...jsxPrettierOptions},
+    noDedup: false
+  }, userOptions);
   let { rootDir } = options;
   if (rootDir && options.resourcePath) {
     const [, ...rest] = options.resourcePath.split(rootDir);
@@ -282,7 +286,7 @@ const pugToJsx = (source, userOptions = {}) => {
     result = {
       ...result,
       jsxTemplate: prettier.format(jsxTemplate, {
-        ...jsxPrettierOptions,
+        ...options.prettier,
         semi: true,
       }),
       usage: getUsage(result),
